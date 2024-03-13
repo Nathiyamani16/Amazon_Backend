@@ -6,10 +6,13 @@ const cors = require("cors"); // Import the cors middleware
 const app = express();
 const PORT = 5000;
 const CartItem = require("./cartModel");
+const profileRoutes = require("./profileRoutes")
+const User = require("./userModel")
 
 
 app.use(express.json());
 app.use(cors()); // Enable CORS for all routes
+app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
 
 // Connect to MongoDB
 mongoose.connect('mongodb://127.0.0.1:27017/Amazon_Collection', {
@@ -18,18 +21,43 @@ mongoose.connect('mongodb://127.0.0.1:27017/Amazon_Collection', {
 });
 
 
-const userSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  number: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  cart: [{ type: mongoose.Schema.Types.ObjectId, ref: "CartItem" }],
+// app.use("/api/profile", profileRoutes);
+// const userSchema = new mongoose.Schema({
+//   name: { type: String, required: true },
+//   number: { type: String, required: true },
+//   email: { type: String, required: true, unique: true },
+//   password: { type: String, required: true },
+//   cart: [{ type: mongoose.Schema.Types.ObjectId, ref: "CartItem" }],
+// });
+
+
+// const User = mongoose.model("User", userSchema);
+
+// Backend route to get user profile
+app.get("/api/profile/:email", async (req, res) => {
+  const { email } = req.params;
+  
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Return only the necessary profile information
+    const userProfile = {
+      name: user.name,
+      number: user.number,
+      email: user.email,
+    };
+
+    res.status(200).json(userProfile);
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
-
-
-const User = mongoose.model("User", userSchema);
-
-
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -45,7 +73,7 @@ const storage = multer.diskStorage({
 
   app.use('/uploads', express.static('uploads'));
 
-
+  
 
   app.post("/api/signup", async (req, res) => {
     const { name, number, email, password } = req.body;
