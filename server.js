@@ -760,7 +760,8 @@ app.use(express.json());
 app.use(cors()); // Enable CORS for all routes
 
 // Connect to MongoDB
-mongoose.connect('mongodb://127.0.0.1:27017/Amazon_Clone', {
+mongoose.connect('mongodb+srv://nathiya16saraswathi:wuSU0wioszqpKRUU@cluster0.i7bvl.mongodb.net/', {
+
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -968,40 +969,8 @@ app.post("/api/uploadd", upload.fields([{ name: "profileImage" }]), async (req, 
       res.status(500).json({ error: "Internal Server Error" });
     }
   });
-
-//   const user = {
-//     id: 1,
-//     name: "John Doe",
-//     email: "john@example.com",
-//   };
   
-//   // Route to fetch user data
-//   app.get("/api/user", (req, res) => {
-//     res.json(user);
-//   });
-
-// // Assuming you are using a database like MongoDB
-// const User = require("./models/User"); // Import your User model
-app.get("/api/user", async (req, res) => {
-  try {
-    const { email } = req.query;
-    if (!email) {
-      return res.status(400).json({ message: "Email is required" });
-    }
-
-    // Assuming you have a User model
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    res.json({ name: user.name });
-  } catch (error) {
-    console.error("Error fetching user data:", error);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
+  
 
 
 
